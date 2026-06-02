@@ -7,7 +7,6 @@ def test_ingredient_creation():
     assert ingredient.unit == "г"
 def test_ingredient_str():
     ingredient = Ingredient("Мука", 500, "г")
-
     assert str(ingredient) == "Мука: 500.0 г"
 def test_ingredient_eq_same_name_and_unit():
     ingredient1 = Ingredient("Мука", 500, "г")
@@ -21,3 +20,39 @@ def test_ingredient_eq_different_unit():
     ingredient1 = Ingredient("Мука", 500, "г")
     ingredient2 = Ingredient("Мука", 500, "кг")
     assert ingredient1 != ingredient2
+
+def test_recipe_creation():
+    ingredients = [Ingredient("Мука", 500, "г"),Ingredient("Сыр", 100, "г")]
+    recipe = Recipe("Маргарита", ingredients)
+    assert recipe.title == "Маргарита"
+    assert recipe.ingredients == ingredients
+def test_recipe_add_ingredient():
+    recipe = Recipe("Пицца")
+    recipe.add_ingredient(Ingredient("Мука", 500, "г"))
+    assert recipe.ingredients[0].name == "Мука"
+    assert recipe.ingredients[0].quantity == 500.0
+    assert recipe.ingredients[0].unit == "г"
+    recipe.add_ingredient(Ingredient("Мука", 100, "г"))
+    assert len(recipe.ingredients) == 1
+    assert recipe.ingredients[0].quantity == 600.0
+def test_recipe_scale_returns_new_recipe():
+    recipe = Recipe("Пицца")
+    recipe.add_ingredient(Ingredient("Мука", 500, "г"))
+    scaled = recipe.scale(2)
+    assert isinstance(scaled, Recipe)
+    assert scaled is not recipe
+def test_recipe_scale_multiplies():
+    recipe = Recipe("Пицца")
+    recipe.add_ingredient(Ingredient("Мука", 500, "г"))
+    scaled = recipe.scale(2)
+    assert scaled.ingredients[0].quantity == 1000.0
+def test_recipe_scale_invalid_ratio():
+    recipe = Recipe("Пицца")
+    with pytest.raises(ValueError):
+        recipe.scale(-1)
+def test_recipe_len():
+    recipe = Recipe("Пицца")
+    recipe.add_ingredient(Ingredient("Мука", 500, "г"))
+    recipe.add_ingredient(Ingredient("Мука", 100, "г"))
+    recipe.add_ingredient(Ingredient("Сыр", 50, "г"))
+    assert len(recipe) == 2
