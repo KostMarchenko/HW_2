@@ -56,3 +56,98 @@ def test_recipe_len():
     recipe.add_ingredient(Ingredient("Мука", 100, "г"))
     recipe.add_ingredient(Ingredient("Сыр", 50, "г"))
     assert len(recipe) == 2
+
+def test_shopping_list_add_recipe():
+    recipe = Recipe("Пицца")
+    recipe.add_ingredient(Ingredient("Мука", 500, "г"))
+    shopping_list = ShoppingList()
+    shopping_list.add_recipe(recipe, 2)
+    result = shopping_list.get_list()
+    assert len(result) == 1
+    assert result[0].name == "Мука"
+    assert result[0].quantity == 1000.0
+    assert result[0].unit == "г"
+def test_shopping_list_add_recipe_invalid_portions():
+    recipe = Recipe("Пицца")
+    shopping_list = ShoppingList()
+    with pytest.raises(ValueError):
+        shopping_list.add_recipe(recipe, -1)
+def test_shopping_list_remove_recipe():
+    recipe1 = Recipe("Пирог")
+    recipe1.add_ingredient(Ingredient("Мука", 500, "г"))
+    recipe2 = Recipe("Пицца")
+    recipe2.add_ingredient(Ingredient("Сыр", 200, "г"))
+    shopping_list = ShoppingList()
+    shopping_list.add_recipe(recipe1, 1)
+    shopping_list.add_recipe(recipe2, 1)
+    shopping_list.remove_recipe("Пирог")
+    result = shopping_list.get_list()
+    assert len(result) == 1
+    assert result[0].name == "Сыр"
+    assert result[0].quantity == 200.0
+def test_shopping_list_remove_no_recipe():
+    recipe = Recipe("Пирог")
+    recipe.add_ingredient(Ingredient("Мука", 500, "г"))
+    shopping_list = ShoppingList()
+    shopping_list.add_recipe(recipe, 1)
+    shopping_list.remove_recipe("Пицца")
+    result = shopping_list.get_list()
+    assert len(result) == 1
+    assert result[0].name == "Мука"
+    assert result[0].quantity == 500.0
+def test_shopping_list_get_list_summ_sameingredients():
+    recipe1 = Recipe("Пирог")
+    recipe1.add_ingredient(Ingredient("Мука", 500, "г"))
+    recipe2 = Recipe("Пицца")
+    recipe2.add_ingredient(Ingredient("Мука", 300, "г"))
+    shopping_list = ShoppingList()
+    shopping_list.add_recipe(recipe1, 1)
+    shopping_list.add_recipe(recipe2, 1)
+    result = shopping_list.get_list()
+    assert len(result) == 1
+    assert result[0].name == "Мука"
+    assert result[0].quantity == 800.0
+    assert result[0].unit == "г"
+def test_shopping_list_get_list_sorted_by_name():
+    recipe = Recipe("Пицца")
+    recipe.add_ingredient(Ingredient("Ананас", 200, "г"))
+    recipe.add_ingredient(Ingredient("Мука", 500, "г"))
+    recipe.add_ingredient(Ingredient("Яйцо", 2, "шт"))
+    shopping_list = ShoppingList()
+    shopping_list.add_recipe(recipe, 1)
+    result = shopping_list.get_list()
+    names = []
+    for ingr in result:
+        names.append(ingr.name)
+    assert names == ["Ананас", "Мука", "Яйцо"]
+def test_shopping_list_add_summ_2_lists():
+    recipe1 = Recipe("Пирог")
+    recipe1.add_ingredient(Ingredient("Мука", 500, "г"))
+    recipe2 = Recipe("Пицца")
+    recipe2.add_ingredient(Ingredient("Сыр", 200, "г"))
+    list1 = ShoppingList()
+    list2 = ShoppingList()
+    list1.add_recipe(recipe1, 1)
+    list2.add_recipe(recipe2, 1)
+    result_list = list1 + list2
+    result = result_list.get_list()
+    assert isinstance(result_list, ShoppingList)
+    assert len(result) == 2
+    names = []
+    for ingr in result:
+        names.append(ingr.name)
+    assert names == ["Мука", "Сыр"]
+def test_shopping_list_add_do_not_change_original_lists():
+    recipe1 = Recipe("Пирог")
+    recipe1.add_ingredient(Ingredient("Мука", 500, "г"))
+    recipe2 = Recipe("Пицца")
+    recipe2.add_ingredient(Ingredient("Сыр", 200, "г"))
+    list1 = ShoppingList()
+    list2 = ShoppingList()
+    list1.add_recipe(recipe1, 1)
+    list2.add_recipe(recipe2, 1)
+    result_list = list1 + list2
+    assert len(list1.get_list()) == 1
+    assert list1.get_list()[0].name == "Мука"
+    assert len(list2.get_list()) == 1
+    assert list2.get_list()[0].name == "Сыр"
