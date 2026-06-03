@@ -19,9 +19,12 @@ class Ingredient:
     def __eq__(self, other):
         return (self.name == other.name and self.unit == other.unit)
 class Recipe:
-    def __init__(self,title, ingredients):
+    def __init__(self,title, ingredients=None):
         self.title = title
-        self.ingredients = ingredients
+        if ingredients is not None:
+            self.ingredients = ingredients
+        else:
+            self.ingredients = []
     def add_ingredient(self, ingredient: Ingredient):
         for ingr in self.ingredients:
             if ingr == ingredient:
